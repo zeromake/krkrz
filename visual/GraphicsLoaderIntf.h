@@ -16,7 +16,7 @@
 #ifdef _WIN32
 #include <objidl.h>
 #else
-#include "istream_compat.h"
+#include "StorageImpl.h"
 #endif
 #include "drawable.h"
 
