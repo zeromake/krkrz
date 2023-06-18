@@ -321,7 +321,7 @@ bool TVPIsXP3Archive(const ttstr &name)
 	tTVPStreamHolder holder(name);
 	try
 	{
-		tjs_uint64 offset;
+		tjs_uint64 offset = 0;
 		return TVPGetXP3ArchiveOffset(holder.Get(), name, offset, false);
 	}
 	catch(...)
@@ -335,7 +335,7 @@ tTVPXP3Archive::tTVPXP3Archive(const ttstr & name) : tTVPArchive(name)
 	Name = name;
 	Count = 0;
 
-	tjs_uint64 offset;
+	tjs_uint64 offset = 0;
 
 	tTJSBinaryStream *st = TVPCreateStream(name);
 
