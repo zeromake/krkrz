@@ -33,6 +33,11 @@
         "image" : "ghcr.io/uyjulian/tvp_win32_build_container:latest",
         "options" : "--user 1001:123"
       },
+      "defaults" : {
+        "run" : {
+          "shell" : "bash"
+        }
+      },
       "strategy" : {
         "matrix" : {
           "platform" : [
