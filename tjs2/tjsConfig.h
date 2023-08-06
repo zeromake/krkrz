@@ -50,22 +50,42 @@ TJS_EXP_FUNC_DEF(tjs_int, TJS_stricmp, (const tjs_char *s1, const tjs_char *s2))
 TJS_EXP_FUNC_DEF(void, TJS_strcpy_maxlen, (tjs_char *d, const tjs_char *s, size_t len));
 TJS_EXP_FUNC_DEF(void, TJS_strcpy, (tjs_char *d, const tjs_char *s));
 TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strstr, (const tjs_char *big, const tjs_char *little));
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_int, TJS_strcmp, (const tjs_char *s1, const tjs_char *s2));
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_int, TJS_strncmp, (const tjs_char *s1, const tjs_char *s2, size_t n));
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strncpy, (tjs_char * __restrict dst, const tjs_char * __restrict src, size_t n));
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strncpy_s, (tjs_char * __restrict dst, size_t dstCount, const tjs_char * __restrict src, size_t n));
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strcat, (tjs_char * __restrict s1, const tjs_char * __restrict s2));
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strchr, (const tjs_char *s, tjs_char c));
 TJS_EXP_FUNC_DEF(tjs_size, TJS_strspn, (const tjs_char *s, const tjs_char *set) );
 extern tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... );
 extern tjs_int TJS_snprintf( tjs_char* buffer, size_t cnt, const tjs_char * format, ... );
 TJS_EXP_FUNC_DEF(tjs_int, TJS_vsnprintf, ( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param ) );
+/* $$({"tp_stub_ppcond":"!defined(_WIN32)"})$$ */
 TJS_EXP_FUNC_DEF(tjs_real, TJS_strtod, (const tjs_char *nptr, tjs_char **endptr) );
 
 // for plugin
 #ifdef __TP_STUB_H__
 /*[*/
+#if defined(_WIN32)
+/* For compatibility purposes, these symbols are defined as they were in Kirikiri Z */
+#define TJS_strcmp			wcscmp
+#define TJS_strncmp			wcsncmp
+#define TJS_strncpy			wcsncpy
+#define TJS_strcat			wcscat
+#define TJS_strstr			wcsstr
+#define TJS_strchr			wcschr
+#define TJS_strtod			wcstod
+#define TJS_vfprintf		vfwprintf
+/* FIXME: No vendored implementation of the following */
+#define TJS_strftime		wcsftime
+#endif
 extern tjs_int TJS_vsnprintf( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param );
 inline tjs_int TJS_snprintf( tjs_char *str, size_t count, const tjs_char *fmt, ... ) {
 	size_t ret;
@@ -86,6 +106,7 @@ inline tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... ) {
 /*]*/
 #endif
 
+/*[*/
 #define TJS_malloc			malloc
 #define TJS_free			free
 #define TJS_realloc			realloc
@@ -96,6 +117,7 @@ inline tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... ) {
 #define TJS_nstrstr			strstr
 #define TJS_octetcpy		memcpy
 #define TJS_octetcmp		memcmp
+/*]*/
 
 
 extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
@@ -139,7 +161,9 @@ inline bool TJS_iswalpha(tjs_char ch) {
 
 #ifdef TJS_DEBUG_TRACE
 void TJS_debug_out( const tjs_char *format, ... );
+#if 0
 #define TJS_vfprintf		vfwprintf
+#endif
 #define TJS_D(x)	TJS_debug_out x;
 #define TJS_F_TRACE(x) tTJSFuncTrace ___trace(TJS_W(x));
 #else
