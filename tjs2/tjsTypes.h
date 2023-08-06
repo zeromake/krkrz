@@ -255,17 +255,20 @@ typedef uintptr_t tjs_uintptr_t;
 	#define TJS_HOST_IS_LITTLE_ENDIAN 1
 #endif
 
-#define TJS_INTF_METHOD
-#define TJS_USERENTRY
-
-#if 0
 #ifndef TJS_INTF_METHOD
+#ifdef _WIN32
 #define TJS_INTF_METHOD __cdecl
 	/* TJS_INTF_METHOD is "cdecl" (by default)
 		since TJS2 2.4.14 (kirikir2 2.25 beta 1) */
+#else
+#define TJS_INTF_METHOD
+#endif
 #endif
 
+#ifdef _WIN32
 #define TJS_USERENTRY __cdecl
+#else
+#define TJS_USERENTRY
 #endif
 
 #if defined(__WCHAR_MAX__) && (__WCHAR_MAX__ != 0x7fff && __WCHAR_MAX__ != 0xffff)
