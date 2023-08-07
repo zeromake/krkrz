@@ -169,6 +169,7 @@ inline tjs_string ExpandUNCFileName( const tjs_string& path ) {
 #ifdef _WIN32
 	tjs_string result;
 	DWORD InfoSize = 0;
+#ifndef TVP_COMPILING_KRKRSDL2
 	if( ERROR_MORE_DATA == WNetGetUniversalName( path.c_str(), UNIVERSAL_NAME_INFO_LEVEL, NULL, &InfoSize) ) {
 		UNIVERSAL_NAME_INFO* pInfo = reinterpret_cast<UNIVERSAL_NAME_INFO*>( ::GlobalAlloc(GMEM_FIXED, InfoSize) );
 		DWORD ret = ::WNetGetUniversalName( path.c_str(), UNIVERSAL_NAME_INFO_LEVEL, pInfo, &InfoSize);
@@ -176,7 +177,9 @@ inline tjs_string ExpandUNCFileName( const tjs_string& path ) {
 			result = tjs_string(pInfo->lpUniversalName);
 		}
 		::GlobalFree(pInfo);
-	} else {
+	} else
+#endif
+	{
 		tjs_char fullpath[_MAX_PATH];
 		result = tjs_string( _wfullpath( fullpath, path.c_str(), _MAX_PATH ) );
 	}
