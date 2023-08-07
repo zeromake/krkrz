@@ -41,6 +41,19 @@ extern void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
 extern tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode();
 #endif
 
+#ifdef TVP_COMPILING_KRKRSDL2
+#ifdef TVP_FAUDIO_IMPLEMENT
+static void (*TVPSetGlobalVolume)(tjs_int v) = TVPQueueSoundSetGlobalVolume;
+static tjs_int (*TVPGetGlobalVolume)() = TVPQueueSoundGetGlobalVolume;
+static void (*TVPSetGlobalFocusMode)(tTVPSoundGlobalFocusMode b) = TVPQueueSoundSetGlobalFocusMode;
+static tTVPSoundGlobalFocusMode (*TVPGetGlobalFocusMode)() = TVPQueueSoundGetGlobalFocusMode;
+#else
+static void (*TVPSetGlobalVolume)(tjs_int v) = TVPSoundSetGlobalVolume;
+static tjs_int (*TVPGetGlobalVolume)() = TVPSoundGetGlobalVolume;
+static void (*TVPSetGlobalFocusMode)(tTVPSoundGlobalFocusMode b) = TVPSoundSetGlobalFocusMode;
+static tTVPSoundGlobalFocusMode (*TVPGetGlobalFocusMode)() = TVPSoundGetGlobalFocusMode;
+#endif
+#else
 #if 0
 static void (*TVPSetGlobalVolume)(tjs_int v) = TVPQueueSoundSetGlobalVolume;
 static tjs_int (*TVPGetGlobalVolume)() = TVPQueueSoundGetGlobalVolume;
@@ -51,6 +64,7 @@ static void (*TVPSetGlobalVolume)(tjs_int v) = TVPSoundSetGlobalVolume;
 static tjs_int (*TVPGetGlobalVolume)() = TVPSoundGetGlobalVolume;
 static void (*TVPSetGlobalFocusMode)(tTVPSoundGlobalFocusMode b) = TVPSoundSetGlobalFocusMode;
 static tTVPSoundGlobalFocusMode (*TVPGetGlobalFocusMode)() = TVPSoundGetGlobalFocusMode;
+#endif
 #endif
 
 //---------------------------------------------------------------------------
@@ -1827,6 +1841,21 @@ extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
 
 tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
 {
+#ifdef TVP_COMPILING_KRKRSDL2
+#ifdef TVP_FAUDIO_IMPLEMENT
+	TVPSetGlobalVolume = TVPQueueSoundSetGlobalVolume;
+	TVPGetGlobalVolume = TVPQueueSoundGetGlobalVolume;
+	TVPSetGlobalFocusMode = TVPQueueSoundSetGlobalFocusMode;
+	TVPGetGlobalFocusMode = TVPQueueSoundGetGlobalFocusMode;
+	return TVPCreateNativeClass_QueueSoundBuffer();
+#else
+	TVPSetGlobalVolume = TVPSoundSetGlobalVolume;
+	TVPGetGlobalVolume = TVPSoundGetGlobalVolume;
+	TVPSetGlobalFocusMode = TVPSoundSetGlobalFocusMode;
+	TVPGetGlobalFocusMode = TVPSoundGetGlobalFocusMode;
+	return TVPCreateNativeClass_WaveSoundBuffer();
+#endif
+#else
 #if 0
 #ifdef _WIN32
 	if( TVPHasXAudio2DLL() ) {	// TODO オプションでXAudio2かDirectSoundのどちらを使うか選べる方が好ましい、Wasapiに対応できればもっといい。オプション追加した場合、DS用オプションが色々あるのでその辺りも検討必要。
@@ -1851,5 +1880,6 @@ tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
 	TVPSetGlobalFocusMode = TVPSoundSetGlobalFocusMode;
 	TVPGetGlobalFocusMode = TVPSoundGetGlobalFocusMode;
 	return TVPCreateNativeClass_WaveSoundBuffer();
+#endif
 }
 //---------------------------------------------------------------------------
