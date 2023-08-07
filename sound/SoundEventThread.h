@@ -18,8 +18,12 @@
 class tTVPSoundEventThread : public tTVPThread
 {
 	tTVPThreadEvent Event;
+#ifdef KRKRZ_USE_SDL_THREADS
+	SDL_mutex *SuspendMutex;
+#else
 #if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 	std::mutex SuspendMutex;
+#endif
 #endif
 	bool SuspendThread;
 
@@ -39,17 +43,31 @@ private:
 
 	void SetSuspend()
 	{
+#ifdef KRKRZ_USE_SDL_THREADS
+		SDL_LockMutex(SuspendMutex);
+#else
 #if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 		std::lock_guard<std::mutex> lock( SuspendMutex );
 #endif
+#endif
 		SuspendThread = true;
+#ifdef KRKRZ_USE_SDL_THREADS
+		SDL_UnlockMutex(SuspendMutex);
+#endif
 	}
 	void ResetSuspend()
 	{
+#ifdef KRKRZ_USE_SDL_THREADS
+		SDL_LockMutex(SuspendMutex);
+#else
 #if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 		std::lock_guard<std::mutex> lock( SuspendMutex );
 #endif
+#endif
 		SuspendThread = false;
+#ifdef KRKRZ_USE_SDL_THREADS
+		SDL_UnlockMutex(SuspendMutex);
+#endif
 	}
 
 public:

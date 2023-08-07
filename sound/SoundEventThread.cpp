@@ -15,6 +15,9 @@ tTVPSoundEventThread::tTVPSoundEventThread( tTVPSoundBuffers* parent )
 	SuspendThread( false ), PendingLabelEventExists( false ),
 	NextLabelEventTick( 0 ), LastFilledTick( 0 ), WndProcToBeCalled( false )
 {
+#ifdef KRKRZ_USE_SDL_THREADS
+	SuspendMutex = SDL_CreateMutex();
+#endif
 	EventQueue.Allocate();
 	SetPriority(ttpHighest);
 	StartTread();
@@ -28,6 +31,9 @@ tTVPSoundEventThread::~tTVPSoundEventThread()
 	Event.Set();
 	WaitFor();
 	EventQueue.Deallocate();
+#ifdef KRKRZ_USE_SDL_THREADS
+	SDL_DestroyMutex(SuspendMutex);
+#endif
 }
 //---------------------------------------------------------------------------
 void tTVPSoundEventThread::UtilWndProc( NativeEvent& ev )
@@ -146,10 +152,17 @@ void tTVPSoundEventThread::Execute(void)
 		if( !GetTerminated() ) {
 			bool suspendrequest = false;
 			{
+#ifdef KRKRZ_USE_SDL_THREADS
+				SDL_LockMutex(SuspendMutex);
+#else
 #if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 				std::lock_guard<std::mutex> lock( SuspendMutex );
 #endif
+#endif
 				suspendrequest = SuspendThread;
+#ifdef KRKRZ_USE_SDL_THREADS
+				SDL_UnlockMutex(SuspendMutex);
+#endif
 			}
 			if( suspendrequest ) {
 				Event.WaitFor( 0 );	// infinity
