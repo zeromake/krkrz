@@ -129,6 +129,9 @@ tTJSNI_QueueSoundBuffer::tTJSNI_QueueSoundBuffer() : Player(this)
 {
 	TVPInitSoundOptions();
 	// TVPRegisterTSSWaveDecoderCreator();
+#ifdef TVP_COMPILING_KRKRSDL2
+	TVPRegisterTSSWaveDecoderCreator();
+#endif
 	Decoder = nullptr;
 	LoopManager = nullptr;
 	Thread = nullptr;
