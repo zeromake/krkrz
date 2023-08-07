@@ -146,7 +146,9 @@ void tTVPSoundEventThread::Execute(void)
 		if( !GetTerminated() ) {
 			bool suspendrequest = false;
 			{
+#if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 				std::lock_guard<std::mutex> lock( SuspendMutex );
+#endif
 				suspendrequest = SuspendThread;
 			}
 			if( suspendrequest ) {

@@ -61,7 +61,9 @@ void tTVPSoundDecodeThread::Execute(void) {
 			// buffer is not full; sleep shorter
 			// ダブルバッファリングなのでここに来る可能性は低いが、デコードが極度に送れている場合は来る
 			// 一応スレッド切り替えして占有は避け、次のバッファをデコードする
+#if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 			std::this_thread::yield();
+#endif
 		}
 	}
 }

@@ -18,7 +18,9 @@
 class tTVPSoundEventThread : public tTVPThread
 {
 	tTVPThreadEvent Event;
+#if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 	std::mutex SuspendMutex;
+#endif
 	bool SuspendThread;
 
 	bool PendingLabelEventExists;
@@ -37,12 +39,16 @@ private:
 
 	void SetSuspend()
 	{
+#if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 		std::lock_guard<std::mutex> lock( SuspendMutex );
+#endif
 		SuspendThread = true;
 	}
 	void ResetSuspend()
 	{
+#if !defined(__EMSCRIPTEN__) || (defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__))
 		std::lock_guard<std::mutex> lock( SuspendMutex );
+#endif
 		SuspendThread = false;
 	}
 
