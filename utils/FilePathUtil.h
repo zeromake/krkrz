@@ -46,6 +46,17 @@ inline tjs_string ExcludeTrailingForwardslash( const tjs_string& path ) {
 	}
 	return tjs_string(path);
 }
+inline tjs_string IncludeTrailingSlash( const tjs_string& path ) {
+#ifdef _WIN32
+	return IncludeTrailingBackslash(path);
+#else
+	return IncludeTrailingForwardslash(path);
+#endif
+}
+inline tjs_string ExcludeTrailingSlash( const tjs_string& path ) {
+	tjs_string path1 = IncludeTrailingBackslash(path);
+	return IncludeTrailingForwardslash(path1);
+}
 // 末尾の /\ は含まない
 inline tjs_string ExtractFileDir( const tjs_string& path ) {
 	tjs_char drive[_MAX_DRIVE];
