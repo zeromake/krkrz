@@ -54,8 +54,8 @@ inline tjs_string IncludeTrailingSlash( const tjs_string& path ) {
 #endif
 }
 inline tjs_string ExcludeTrailingSlash( const tjs_string& path ) {
-	tjs_string path1 = IncludeTrailingBackslash(path);
-	return IncludeTrailingForwardslash(path1);
+	tjs_string path1 = ExcludeTrailingBackslash(path);
+	return ExcludeTrailingForwardslash(path1);
 }
 // 末尾の /\ は含まない
 inline tjs_string ExtractFileDir( const tjs_string& path ) {
