@@ -54,7 +54,7 @@ CFLAGS += $(INCFLAGS) -DGIT_TAG=L\"$(GIT_TAG)\" -DWIN32 -D_WINDOWS -DNO_STRICT -
 # CFLAGS += -DWITH_SIMD
 CFLAGS += -DTVP_LOG_TO_COMMANDLINE_CONSOLE -DTJS_TEXT_OUT_CRLF -DTJS_JP_LOCALIZED -DTJS_DEBUG_DUMP_STRING -DTVP_OPUS_DECODER_IMPLEMENT
 CFLAGS += -MMD -MF $(patsubst %$(OBJECT_EXTENSION),%$(DEP_EXTENSION),$@)
-CXXFLAGS += $(CFLAGS) -fpermissive
+CXXFLAGS += $(CFLAGS) -fpermissive -std=gnu++14
 LDFLAGS += -static -static-libstdc++ -static-libgcc -municode -fPIC -flto
 LDLIBS += -lwinmm -lws2_32 -lcomctl32 -lgdi32 -lwinhttp -lpsapi -luser32 -lcomdlg32 -lole32 -lshell32 -ladvapi32 -loleaut32 -limm32 -lversion -lshlwapi -ldbghelp -luuid -lmpr
 
