@@ -210,7 +210,7 @@ void tTVPEmergencyExitThread::Execute(void)
 	}
 }
 //---------------------------------------------------------------------------
-static std::auto_ptr<tTVPEmergencyExitThread>
+static std::unique_ptr<tTVPEmergencyExitThread>
 	TVPEmergencyExitThread(new tTVPEmergencyExitThread);
 //---------------------------------------------------------------------------
 #endif
