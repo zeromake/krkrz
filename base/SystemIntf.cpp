@@ -458,6 +458,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exitOnNoWindowStartup)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL(exitOnNoWindowStartup)
 //----------------------------------------------------------------------
+#if 0
 TJS_BEGIN_NATIVE_PROP_DECL(isWindows) {
 	TJS_BEGIN_NATIVE_PROP_GETTER {
 #ifdef WIN32
@@ -471,7 +472,9 @@ TJS_BEGIN_NATIVE_PROP_DECL(isWindows) {
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL(isWindows)
+#endif
 //----------------------------------------------------------------------
+#if 0
 TJS_BEGIN_NATIVE_PROP_DECL(isAndroid) {
 	TJS_BEGIN_NATIVE_PROP_GETTER {
 #ifdef ANDROID
@@ -485,6 +488,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(isAndroid) {
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL(isAndroid)
+#endif
 //----------------------------------------------------------------------
 #if 0
 TJS_BEGIN_NATIVE_PROP_DECL(openGLESVersion) {
