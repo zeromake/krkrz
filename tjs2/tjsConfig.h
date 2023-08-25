@@ -86,6 +86,7 @@ TJS_EXP_FUNC_DEF(tjs_real, TJS_strtod, (const tjs_char *nptr, tjs_char **endptr)
 /* FIXME: No vendored implementation of the following */
 #define TJS_strftime		wcsftime
 #endif
+#include <limits.h>
 extern tjs_int TJS_vsnprintf( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param );
 inline tjs_int TJS_snprintf( tjs_char *str, size_t count, const tjs_char *fmt, ... ) {
 	size_t ret;
