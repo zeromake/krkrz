@@ -12,8 +12,8 @@
 
 #include "tjsMath.h"
 #define _USE_MATH_DEFINES
-#include "math.h"
-#include "time.h"
+#include <math.h>
+#include <time.h>
 
 #if defined(_WIN32)
 #ifndef TJS_NO_MASK_MATHERR

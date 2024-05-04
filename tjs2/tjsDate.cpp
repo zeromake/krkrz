@@ -23,10 +23,12 @@ note:
 	are not given here.
 */
 #if defined(_WIN32)
+#if defined(_MSC_VER)
 typedef struct timeval {
 	time_t tv_sec;
 	long tv_usec;
 } timeval;
+#endif
 int gettimeofday(struct timeval * tp, struct timezone * tzp)
 {
 	static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
