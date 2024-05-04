@@ -20,7 +20,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #ifndef TVP_COMPILING_KRKRSDL2
-#include <SDKDDKVer.h>
+#include <sdkddkver.h>
 #endif
 #include <windows.h>
 
