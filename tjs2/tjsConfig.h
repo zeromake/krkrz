@@ -151,7 +151,7 @@ inline bool TJS_iswalpha(tjs_char ch) {
 #elif defined(__GNUC__)
 	#define TJS_cdecl
 	#define TJS_timezone timezone
-#elif __WIN32__
+#elif defined(_WIN32)
 	#define TJS_cdecl __cdecl
 	#define TJS_timezone _timezone
 #endif
@@ -182,7 +182,8 @@ void TJS_debug_out( const tjs_char *format, ... );
 
 #ifdef ANDROID
 #endif
-#ifndef MAX_PATH
+
+#if !defined(MAX_PATH) && !defined(_WIN32)
 #define MAX_PATH 256
 #endif
 

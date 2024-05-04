@@ -253,8 +253,8 @@ tTVPApplication::~tTVPApplication() {
 #if 0
 struct SEHException {
 	unsigned int Code;
-	_EXCEPTION_POINTERS* ExceptionPointers;
-	SEHException( unsigned int code, _EXCEPTION_POINTERS* ep )
+	::EXCEPTION_POINTERS* ExceptionPointers;
+	SEHException( unsigned int code, ::EXCEPTION_POINTERS* ep )
 		: Code(code), ExceptionPointers(ep)
 	{}
 };
@@ -287,7 +287,7 @@ int TVPWriteHWEDumpFile( EXCEPTION_POINTERS* pExceptionPointers ) {
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 static bool TVPIsHandledHWException = false;
-void se_translator_function(unsigned int code, struct _EXCEPTION_POINTERS* ep) {
+void se_translator_function(unsigned int code, ::EXCEPTION_POINTERS* ep) {
 	if( !TVPIsHandledHWException ) {
 		//ShowStackTrace( ep->ContextRecord );
 		TVPWriteHWEDumpFile( ep );

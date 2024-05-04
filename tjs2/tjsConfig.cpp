@@ -16,7 +16,7 @@
 #include <errno.h>
 //#include <codecvt>
 
-#ifdef __WIN32__
+#if defined(_WIN32)
 #include <float.h>
 #include <intrin.h>
 #endif
@@ -583,7 +583,7 @@ void TJSNativeDebuggerBreak()
 	// debugger, or the program may cause an unhandled debugger breakpoint
 	// exception.
 
-#if defined(__WIN32__)
+#if defined(_WIN32)
 	#if defined(_M_IX86)
 		#ifdef __BORLANDC__
 				__emit__ (0xcc); // int 3 (Raise debugger breakpoint exception)
@@ -603,7 +603,7 @@ void TJSNativeDebuggerBreak()
 //---------------------------------------------------------------------------
 // FPU control
 //---------------------------------------------------------------------------
-#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(_WIN32) && !defined(__GNUC__)
 static unsigned int TJSDefaultFPUCW = 0;
 static unsigned int TJSNewFPUCW = 0;
 static unsigned int TJSDefaultMMCW = 0;
@@ -612,7 +612,7 @@ static bool TJSFPUInit = false;
 // FPU例外をマスク
 void TJSSetFPUE()
 {
-#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(_WIN32) && !defined(__GNUC__)
 	if(!TJSFPUInit)
 	{
 		TJSFPUInit = true;
@@ -638,13 +638,13 @@ void TJSSetFPUE()
 //	_fpreset();
 	_control87(TJSNewFPUCW, 0xffff);
 #endif
-#endif	// defined(__WIN32__) && !defined(__GNUC__)
+#endif	// defined(_WIN32) && !defined(__GNUC__)
 
 }
 // 例外マスクを解除し元に戻す
 void TJSRestoreFPUE()
 {
-#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(_WIN32) && !defined(__GNUC__)
 	if(!TJSFPUInit) return;
 #if defined(_M_X64)
 	_MM_SET_EXCEPTION_MASK(TJSDefaultMMCW);

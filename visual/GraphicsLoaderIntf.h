@@ -285,7 +285,7 @@ extern void TVPLoadGraphic(tTVPBaseBitmap *dest, const ttstr &name, tjs_int keyi
 	#define BI_BITFIELDS	3
 #endif
 
-#ifdef __WIN32__
+#if defined(_WIN32)
 #endif
 #if 1
 #pragma pack(push, 1)
@@ -312,7 +312,7 @@ struct TVP_WIN_BITMAPINFOHEADER
 	tjs_uint32	biClrUsed;
 	tjs_uint32	biClrImportant;
 };
-#ifdef __WIN32__
+#if defined(_WIN32)
 #endif
 #if 1
 #pragma pack(pop)

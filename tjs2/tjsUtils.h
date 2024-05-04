@@ -26,7 +26,7 @@
 #endif
 #endif
 #else
-#ifdef __WIN32__
+#if defined(_WIN32)
 #include <windows.h>
 #else
 #include <semaphore.h>
@@ -82,7 +82,7 @@ public:
 #endif
 };
 #else
-#ifdef __WIN32__
+#if defined(_WIN32)
 class tTJSCriticalSection
 {
 	CRITICAL_SECTION CS;

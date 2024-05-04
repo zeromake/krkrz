@@ -86,7 +86,7 @@ public:
 #ifdef _WIN32
 #endif
 #if !defined(TVP_COMPILING_KRKRSDL2) && defined(_WIN32)
-	const BITMAPINFO * GetBITMAPINFO() const { return BitmapInfo->GetBITMAPINFO(); }
+	const BITMAPINFO * GetBITMAPINFO() const { return (const BITMAPINFO *)BitmapInfo->GetBITMAPINFO(); }
 	const BITMAPINFOHEADER * GetBITMAPINFOHEADER() const { return (const BITMAPINFOHEADER*)( BitmapInfo->GetBITMAPINFO() ); }
 #endif
 

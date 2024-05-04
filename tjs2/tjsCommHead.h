@@ -16,11 +16,11 @@
 #ifndef tjsCommHeadH
 #define tjsCommHeadH
 
-#ifdef __WIN32__
+#if defined(_WIN32)
 #define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #ifndef TVP_COMPILING_KRKRSDL2
-#include "targetver.h"
+#include <SDKDDKVer.h>
 #endif
 #include <windows.h>
 

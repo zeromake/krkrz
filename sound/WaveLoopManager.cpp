@@ -55,7 +55,7 @@ const int TVPWaveLoopLinkGiveUpCount = 10;
 	#define TJS_HOST_IS_BIG_ENDIAN 0
 #endif
 
-#ifdef __WIN32__
+#if defined(_WIN32)
 	// for assembler compatibility
 	#pragma pack(push,1)
 #endif
@@ -97,7 +97,7 @@ struct tTVPPCM24
 		return t;
 	}
 };
-#ifdef __WIN32__
+#if defined(_WIN32)
 	#pragma pack(pop)
 #endif
 //---------------------------------------------------------------------------

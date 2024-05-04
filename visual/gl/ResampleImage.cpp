@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #define _USE_MATH_DEFINES
+#include "aligned_allocator.h"
 #include "tjsCommHead.h"
 
 #include <float.h>
@@ -30,7 +31,6 @@
 #include "WeightFunctor.h"
 #include "ThreadIntf.h"
 
-#include "aligned_allocator.h"
 #include "ResampleImageInternal.h"
 
 

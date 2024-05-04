@@ -2,6 +2,7 @@
 
 #define _USE_MATH_DEFINES
 
+#include "aligned_allocator.h"
 #include "tjsCommHead.h"
 #include "LayerBitmapIntf.h"
 #include "LayerBitmapImpl.h"
@@ -22,7 +23,6 @@
 #endif
 
 #include "x86simdutil.h"
-#include "aligned_allocator.h"
 
 #include "WeightFunctorAVX.h"
 #include "ResampleImageInternal.h"
