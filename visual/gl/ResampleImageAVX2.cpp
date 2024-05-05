@@ -2,6 +2,9 @@
 
 #define _USE_MATH_DEFINES
 
+#ifdef TVP_COMPILING_KRKRSDL2
+#include "aligned_allocator.h"
+#endif
 #include "tjsCommHead.h"
 #include "LayerBitmapIntf.h"
 #include "LayerBitmapImpl.h"
@@ -22,7 +25,9 @@
 #endif
 
 #include "x86simdutil.h"
+#ifndef TVP_COMPILING_KRKRSDL2
 #include "aligned_allocator.h"
+#endif
 
 #include "WeightFunctorAVX.h"
 #include "ResampleImageInternal.h"

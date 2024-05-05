@@ -34,7 +34,9 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#ifndef TVP_COMPILING_KRKRSDL2
 #include "MathAlgorithms.h"
+#endif
 #include "PhaseVocoderDSP.h"
 #include "RealFFT.h"
 #include <string.h>
@@ -53,6 +55,7 @@
 #endif
 #endif
 #ifdef TVP_COMPILING_KRKRSDL2
+#include "MathAlgorithms.h"
 // Used: SSE
 #include "SIMDeRenames.h"
 #endif

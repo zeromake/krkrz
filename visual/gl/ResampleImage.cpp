@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #define _USE_MATH_DEFINES
+#ifdef TVP_COMPILING_KRKRSDL2
+#include "aligned_allocator.h"
+#endif
 #include "tjsCommHead.h"
 
 #include <float.h>
@@ -30,7 +33,9 @@
 #include "WeightFunctor.h"
 #include "ThreadIntf.h"
 
+#ifndef TVP_COMPILING_KRKRSDL2
 #include "aligned_allocator.h"
+#endif
 #include "ResampleImageInternal.h"
 
 
