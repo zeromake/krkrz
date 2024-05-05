@@ -277,6 +277,8 @@ typedef uintptr_t tjs_uintptr_t;
 #define TJS_W(X) L##X
 #endif
 
+#endif /* end of defined(_WIN32) && !defined(__GNUC__) */
+
 #ifndef STDCALL
 #ifdef _WIN32
 #define STDCALL __stdcall
@@ -285,7 +287,6 @@ typedef uintptr_t tjs_uintptr_t;
 #endif
 #endif
 
-#endif /* end of defined(_WIN32) && !defined(__GNUC__) */
 /*]*/
 
 /*[*/
