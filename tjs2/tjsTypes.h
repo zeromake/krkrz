@@ -43,6 +43,13 @@
 
 
 /*[*/
+
+#ifdef _WIN32
+#ifndef __WIN32__
+#define __WIN32__ 1
+#endif
+#endif
+
 #if defined(_WIN32)  && !defined(__GNUC__)
 /* VC++/BCC */
 

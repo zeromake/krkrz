@@ -16,6 +16,12 @@
 #ifndef tjsCommHeadH
 #define tjsCommHeadH
 
+#ifdef _WIN32
+#ifndef __WIN32__
+#define __WIN32__ 1
+#endif
+#endif
+
 #ifdef __WIN32__
 #define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
