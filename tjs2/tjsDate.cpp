@@ -22,7 +22,7 @@ note:
 	The author assumes that it is a compiler dependented problem, so any remedies
 	are not given here.
 */
-#if 0 && defined(WIN32)
+#if defined(_WIN32) && defined(_MSC_VER)
 typedef struct timeval {
 	time_t tv_sec;
 	long tv_usec;
