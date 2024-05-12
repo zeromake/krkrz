@@ -650,6 +650,9 @@ public:
 		PropGetter = getter;
 		if( getter ) getter->AddRef();
 		SuperClassGetter = superclass;
+#ifdef ENABLE_DEBUGGER
+		if (Parent) Parent->AddRef();
+#endif	// ENABLE_DEBUGGER
 	}
 	
 	tTJSInterCodeContext( tTJSScriptBlock *block, const tjs_char *name, tTJSContextType type,
@@ -658,6 +661,12 @@ public:
 		tSourcePos* srcPos, tjs_int srcPosSize, std::vector<tjs_int>& superpointer );
 
 	std::vector<tjs_uint8>* ExportByteCode( bool outputdebug, tTJSScriptBlock *block, class tjsConstArrayData& constarray );
+
+protected:
+	void TJSVariantArrayStackAddRef();
+	void TJSVariantArrayStackRelease();
+
+	class tTJSVariantArrayStack *TJSVariantArrayStack = nullptr;
 };
 //---------------------------------------------------------------------------
 }

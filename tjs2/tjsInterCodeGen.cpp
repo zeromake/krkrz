@@ -276,6 +276,7 @@ tTJSInterCodeContext::tTJSInterCodeContext(tTJSInterCodeContext *parent,
 
 		Block = block;
 		block->Add(this);
+		TJSVariantArrayStack = block->GetTJS()->GetVariantArrayStack();
 		if(ContextType != ctTopLevel) Block->AddRef();
 			// owner ScriptBlock hooks global object, so to avoid mutual reference lock.
 
@@ -377,6 +378,7 @@ tTJSInterCodeContext::tTJSInterCodeContext( tTJSScriptBlock *block, const tjs_ch
 		AsGlobalContextMode = false;
 		ContextType = type;
 		Block = block;
+		TJSVariantArrayStack = block->GetTJS()->GetVariantArrayStack();
 	} catch(...) {
 		delete [] Name;
 		throw;
@@ -3928,10 +3930,12 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 		name = constarray.PutString(Name);
 	}
 	// 13 * 4 データ部分のサイズ
-	int srcpossize = 0;
+	int count = 0;
 	if( outputdebug ) {
-		srcpossize = SourcePosArraySize * 8;
+		count = SourcePosArraySize;
 	}
+	
+	int srcpossize = count * 8;
 	int codesize = (CodeAreaSize%2) == 1 ? CodeAreaSize * 2+2 : CodeAreaSize * 2;
 	int datasize = DataAreaSize * 4;
 	int scgpsize = (int)(SuperClassGetterPointer.size() * 4);
@@ -3953,7 +3957,6 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 	Add4ByteToVector( result, propGetter );
 	Add4ByteToVector( result, superClassGetter );
 
-	int count = srcpossize;
 	Add4ByteToVector( result, count);
 	if( outputdebug ) {
 		for( int i = 0; i < count ; i++ ) {

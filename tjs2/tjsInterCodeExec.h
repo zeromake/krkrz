@@ -15,12 +15,45 @@
 
 namespace TJS
 {
-//---------------------------------------------------------------------------
-extern void TJSVariantArrayStackAddRef();
-extern void TJSVariantArrayStackRelease();
 extern void TJSVariantArrayStackCompact();
-extern void TJSVariantArrayStackCompactNow();
+extern void TJSVariantArrayStackCompactNow(tTJSVariantArrayStack *currStack = NULL);
 //---------------------------------------------------------------------------
+class tTJSVariantArrayStack
+{
+//	tTJSCriticalSection CS;
+
+	struct tVariantArray
+	{
+		tTJSVariant *Array;
+		tjs_int Using;
+		tjs_int Allocated;
+	};
+
+	tVariantArray * Arrays; // array of array
+	tjs_int NumArraysAllocated;
+	tjs_int NumArraysUsing;
+	tVariantArray * Current;
+	tjs_int CompactVariantArrayMagic;
+	tjs_int OperationDisabledCount;
+
+	void IncreaseVariantArray(tjs_int num);
+
+	void DecreaseVariantArray(void);
+
+	void InternalCompact(void);
+
+
+public:
+	tTJSVariantArrayStack();
+	~tTJSVariantArrayStack();
+
+	tTJSVariant * Allocate(tjs_int num);
+
+	void Deallocate(tjs_int num, tTJSVariant *ptr);
+
+	void Compact() { InternalCompact(); }
+
+};
 }
 
 

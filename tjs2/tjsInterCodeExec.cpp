@@ -8,9 +8,11 @@
 //---------------------------------------------------------------------------
 // Intermediate Code Execution
 //---------------------------------------------------------------------------
+#include <set>
+#include <mutex>
+#include <thread>
 
 #include "tjsCommHead.h"
-
 #include "tjsInterCodeExec.h"
 #include "tjsInterCodeGen.h"
 #include "tjsScriptBlock.h"
@@ -541,42 +543,10 @@ public:
 #define TJS_COMPACT_FREQ 10000
 static tjs_int TJSCompactVariantArrayMagic = 0;
 
-class tTJSVariantArrayStack
-{
-//	tTJSCriticalSection CS;
-
-	struct tVariantArray
-	{
-		tTJSVariant *Array;
-		tjs_int Using;
-		tjs_int Allocated;
-	};
-
-	tVariantArray * Arrays; // array of array
-	tjs_int NumArraysAllocated;
-	tjs_int NumArraysUsing;
-	tVariantArray * Current;
-	tjs_int CompactVariantArrayMagic;
-	tjs_int OperationDisabledCount;
-
-	void IncreaseVariantArray(tjs_int num);
-
-	void DecreaseVariantArray(void);
-
-	void InternalCompact(void);
+static std::mutex TJSVariantArrayStackMutex;
+static std::set<tTJSVariantArrayStack*> TJSVariantArrayStacks;
 
 
-public:
-	tTJSVariantArrayStack();
-	~tTJSVariantArrayStack();
-
-	tTJSVariant * Allocate(tjs_int num);
-
-	void Deallocate(tjs_int num, tTJSVariant *ptr);
-
-	void Compact() { InternalCompact(); }
-
-} *TJSVariantArrayStack = NULL;
 //---------------------------------------------------------------------------
 tTJSVariantArrayStack::tTJSVariantArrayStack()
 {
@@ -585,6 +555,9 @@ tTJSVariantArrayStack::tTJSVariantArrayStack()
 	Current = NULL;
 	OperationDisabledCount = 0;
 	CompactVariantArrayMagic = TJSCompactVariantArrayMagic;
+
+	std::lock_guard<std::mutex> lk(TJSVariantArrayStackMutex);
+	TJSVariantArrayStacks.insert(this);
 }
 //---------------------------------------------------------------------------
 tTJSVariantArrayStack::~tTJSVariantArrayStack()
@@ -596,6 +569,9 @@ tTJSVariantArrayStack::~tTJSVariantArrayStack()
 		delete [] Arrays[i].Array;
 	}
 	TJS_free(Arrays), Arrays = NULL;
+	
+	std::lock_guard<std::mutex> lk(TJSVariantArrayStackMutex);
+	TJSVariantArrayStacks.erase(this);
 }
 //---------------------------------------------------------------------------
 void tTJSVariantArrayStack::IncreaseVariantArray(tjs_int num)
@@ -731,39 +707,26 @@ inline void tTJSVariantArrayStack::Deallocate(tjs_int num, tTJSVariant *ptr)
 	}
 }
 //---------------------------------------------------------------------------
-static tjs_int TJSVariantArrayStackRefCount = 0;
 //---------------------------------------------------------------------------
-void TJSVariantArrayStackAddRef()
-{
-	if(TJSVariantArrayStackRefCount == 0)
-	{
-		TJSVariantArrayStack = new tTJSVariantArrayStack;
-	}
-	TJSVariantArrayStackRefCount++;
-}
+void tTJSInterCodeContext::TJSVariantArrayStackAddRef() {}
 //---------------------------------------------------------------------------
-void TJSVariantArrayStackRelease()
-{
-	if(TJSVariantArrayStackRefCount == 1)
-	{
-		delete TJSVariantArrayStack;
-		TJSVariantArrayStack = NULL;
-		TJSVariantArrayStackRefCount = 0;
-	}
-	else
-	{
-		TJSVariantArrayStackRefCount--;
-	}
-}
+void tTJSInterCodeContext::TJSVariantArrayStackRelease() {}
 //---------------------------------------------------------------------------
 void TJSVariantArrayStackCompact()
 {
 	TJSCompactVariantArrayMagic++;
 }
 //---------------------------------------------------------------------------
-void TJSVariantArrayStackCompactNow()
+void TJSVariantArrayStackCompactNow(tTJSVariantArrayStack *currStack)
 {
-	if(TJSVariantArrayStack) TJSVariantArrayStack->Compact();
+	if (currStack != NULL) {
+		currStack->Compact();
+	}
+#if 0 // due to multi-thread
+	for (tTJSVariantArrayStack* stk : TJSVariantArrayStacks) {
+		stk->Compact();
+	}
+#endif
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

@@ -111,7 +111,7 @@ tTJS::tTJS()
 	PPValues = NULL;
 
 	// ensure variant array stack for function stack
-	TJSVariantArrayStackAddRef();
+	VariantArrayStack = new tTJSVariantArrayStack;
 
 	// ensure hash table for reserved words
 	TJSReservedWordsHashAddRef();
@@ -210,8 +210,8 @@ tTJS::~tTJS()
 //---------------------------------------------------------------------------
 void tTJS::Cleanup()
 {
-	TJSVariantArrayStackCompactNow();
-	TJSVariantArrayStackRelease();
+	TJSVariantArrayStackCompactNow(VariantArrayStack);
+	delete VariantArrayStack; VariantArrayStack = nullptr;
 
 	if(Global) Global->Release(), Global = NULL;
 
@@ -252,7 +252,7 @@ void tTJS::Release()
 //---------------------------------------------------------------------------
 void tTJS::Shutdown()
 {
-	TJSVariantArrayStackCompactNow();
+	TJSVariantArrayStackCompactNow(VariantArrayStack);
 	Global->Clear();
 	if(Global) Global->Release(), Global = NULL;
 	if(Cache) delete Cache, Cache = NULL;
