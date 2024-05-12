@@ -791,7 +791,9 @@ tTVPWaveDecoder * tTVPWDC_RIFFWave::Create(const ttstr & storagename,
 	}
 }
 //---------------------------------------------------------------------------
-
+#ifdef TVP_FFMPEG_WAVE_DECODER_IMPLEMENT
+extern void TVPRegisterFFMPEGWaveDecoderCreator();
+#endif
 #ifdef TVP_OPUS_DECODER_IMPLEMENT
 extern void TVPRegisterOpusDecoderCreator();
 #endif
@@ -807,6 +809,9 @@ struct tTVPWaveDecoderManager
 	tTVPWaveDecoderManager()
 	{
 		TVPWaveDecoderManagerAvail = true;
+#ifdef TVP_FFMPEG_WAVE_DECODER_IMPLEMENT
+		TVPRegisterFFMPEGWaveDecoderCreator();
+#endif
 		TVPRegisterWaveDecoderCreator(&RIFFWaveDecoderCreator);
 #ifdef TVP_OPUS_DECODER_IMPLEMENT
 		TVPRegisterOpusDecoderCreator();
