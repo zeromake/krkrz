@@ -25,6 +25,107 @@
 #include "tjsError.h"
 #include "CharacterSet.h"
 
+extern "C" int sjis_mbtowc16(tjs_char *wc, const unsigned char *s);
+extern "C" int gbk_mbtowc16(tjs_char *wc, const unsigned char *s);
+extern "C" int utf8_mbtowc16(tjs_char *wc, const unsigned char *s);
+
+
+int(*mbtowc_for_text_stream)(tjs_char *wc, const unsigned char *s) = nullptr;
+
+static size_t _TextStream_mbstowcs(int(*func_mbtowc)(tjs_char *, const unsigned char *), tjs_char *pwcs, const tjs_nchar *s, size_t n)
+{
+    if(!s) return -1;
+    if(pwcs && n == 0) return 0;
+
+    size_t count = 0;
+    int cl;
+    if(!pwcs) {
+        while(*s) {
+			tjs_char wc;
+			cl = func_mbtowc(&wc, (const unsigned char*)s);
+            if(cl <= 0)
+                return -1;
+            s += cl;
+            ++count;
+        }
+    } else {
+        while(*s && n > 0) {
+			cl = func_mbtowc(pwcs, (const unsigned char*)s);
+            if(cl <= 0)
+                return -1;
+            n --;
+            s += cl;
+            pwcs++;
+            ++count;
+        }
+    }
+    return count;
+}
+
+/*
+	Text stream is used by TJS's Array.save, Dictionary.saveStruct etc.
+	to input/output text files.
+*/
+
+extern size_t TextStream_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n) {
+	if (mbtowc_for_text_stream) {
+		return _TextStream_mbstowcs(mbtowc_for_text_stream, pwcs, s, n);
+	}
+	// trying every encoding available
+	size_t ret = _TextStream_mbstowcs(sjis_mbtowc16, pwcs, s, n);
+	if (ret == (size_t)-1) {
+		ret = _TextStream_mbstowcs(utf8_mbtowc16, pwcs, s, n);
+		if (ret != (size_t)-1) {
+			mbtowc_for_text_stream = utf8_mbtowc16;
+			return ret;
+		}
+		ret = _TextStream_mbstowcs(gbk_mbtowc16, pwcs, s, n);
+		if (ret != (size_t)-1) {
+			mbtowc_for_text_stream = gbk_mbtowc16;
+			return ret;
+		}
+	}
+	return ret;
+}
+
+static ttstr enc_utf8 = TJS_W("utf8"), enc_utf8_2 = TJS_W("utf-8"), enc_utf16 = TJS_W("utf16"),
+	enc_utf16_2 = TJS_W("utf-16"), enc_gbk = TJS_W("gbk"), enc_jis = TJS_W("sjis"),
+	enc_jis_2 = TJS_W("shiftjis"), enc_jis_3 = TJS_W("shift_jis"), enc_jis_4 = TJS_W("shift-jis");
+bool TVPStringDecode(const void *p, int len, ttstr& result, ttstr encoding /*= "utf8"*/) {
+	if (encoding == enc_utf8 || encoding == enc_utf8_2) {
+		int n = (int)TJS_mbstowcs(NULL, (char*)p, len);
+		if (n == -1) return false;
+		TJS_mbstowcs(result.AllocBuffer(n), (char*)p, len);
+	} else if (encoding == enc_utf16 || encoding == enc_utf16_2) {
+		memcpy(result.AllocBuffer(len / 2), p, len);
+		result.FixLen();
+	} else if (encoding == enc_jis || encoding == enc_jis_2 || encoding == enc_jis_3 || encoding == enc_jis_4) {
+		int n = _TextStream_mbstowcs(sjis_mbtowc16, NULL, (char*)p, len);
+		if (n == -1) return false;
+		_TextStream_mbstowcs(sjis_mbtowc16, result.AllocBuffer(n), (char*)p, len);
+	} else if (encoding == enc_gbk) {
+		int n = _TextStream_mbstowcs(gbk_mbtowc16, NULL, (char*)p, len);
+		if (n == -1) return false;
+		_TextStream_mbstowcs(gbk_mbtowc16, result.AllocBuffer(n), (char*)p, len);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+bool TVPStringEncode(const ttstr &src, std::string &result, ttstr encoding /*= "utf8"*/)
+{
+	if (encoding == enc_utf8 || encoding == enc_utf8_2) {
+		result = src.AsNarrowStdString();
+	} else if (encoding == enc_utf16 || encoding == enc_utf16_2) {
+		result.resize(src.length() * 2);
+		memcpy((char*)result.c_str(), src.c_str(), src.length() * 2);
+	} else {
+		return false;
+	}
+	return true;
+}
+
 /*
 	Text stream is used by TJS's Array.save, Dictionary.saveStruct etc.
 	to input/output text files.
@@ -97,6 +198,7 @@ public:
 			Stream->Read(mark, 2);
 			if(mark[0] == 0xff && mark[1] == 0xfe)
 			{
+				// utf16le
 				// unicode
 				DirectLoad = true;
 			}
@@ -206,25 +308,19 @@ public:
 					// ansi/mbcs
 					// read whole and hold it
 					Stream->SetPosition(ofs);
-					tjs_uint size = (tjs_uint)(Stream->GetSize());
+					tjs_uint size = (tjs_uint)(Stream->GetSize()) - ofs;
 					tjs_uint8 *nbuf = new tjs_uint8[size + 1];
 					try
 					{
+						
 						Stream->ReadBuffer(nbuf, size);
 						nbuf[size] = 0; // terminater
-						if( encoding == TJS_W("UTF-8") ) {
-							BufferLen = TVPUtf8ToWideCharString((const char*)nbuf, NULL);
-							if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
-							Buffer = new tjs_char [ BufferLen +1];
-							TVPUtf8ToWideCharString((const char*)nbuf, Buffer);
-						} else if( encoding == TJS_W("Shift_JIS") ) {
-							BufferLen = TJS_narrowtowidelen((tjs_nchar*)nbuf);
-							if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
-							Buffer = new tjs_char [ BufferLen +1];
-							TJS_narrowtowide(Buffer, (tjs_nchar*)nbuf, BufferLen);
-						} else {
-							TVPThrowExceptionMessage(TVPUnsupportedEncoding, encoding);
+						BufferLen = TextStream_mbstowcs(NULL, (tjs_nchar*)nbuf, 0);
+						if (BufferLen == (size_t)-1) {
+							TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
 						}
+						Buffer = new tjs_char [ BufferLen +1];
+						TextStream_mbstowcs(Buffer, (tjs_nchar*)nbuf, BufferLen);
 					}
 					catch(...)
 					{
