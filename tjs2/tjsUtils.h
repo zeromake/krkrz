@@ -134,6 +134,21 @@ public:
 typedef tTJSCriticalSectionHolder tTJSCSH;
 //---------------------------------------------------------------------------
 
+struct tTJSSpinLock {
+	std::atomic_flag atom_lock;
+	tTJSSpinLock();
+	void lock(); // will stuck if locked in same thread!
+	void unlock();
+};
+
+class tTJSSpinLockHolder {
+	tTJSSpinLock* Lock;
+public:
+	tTJSSpinLockHolder(tTJSSpinLock &lock);
+
+	~tTJSSpinLockHolder();
+};
+
 //---------------------------------------------------------------------------
 // tTJSAtExit / tTJSAtStart
 //---------------------------------------------------------------------------
