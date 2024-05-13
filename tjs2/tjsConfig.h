@@ -121,10 +121,10 @@ inline tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... ) {
 /*]*/
 
 
-extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
-extern size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n);
-extern int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n);
-extern int TJS_wctomb(tjs_nchar *s, tjs_char wc);
+extern size_t TJS_mbstowcs_utf8(tjs_char *pwcs, const tjs_nchar *s, size_t n);
+extern size_t TJS_wcstombs_utf8(tjs_nchar *s, const tjs_char *pwcs, size_t n);
+extern int TJS_mbtowc_utf8(tjs_char *pwc, const tjs_nchar *s, size_t n);
+extern int TJS_wctomb_utf8(tjs_nchar *s, tjs_char wc);
 
 #ifdef __cplusplus
 inline bool TJS_iswspace(tjs_char ch) {
@@ -156,8 +156,8 @@ inline bool TJS_iswalpha(tjs_char ch) {
 	#define TJS_timezone _timezone
 #endif
 
-#define TJS_narrowtowidelen(X) TJS_mbstowcs(NULL, (X),0) // narrow->wide (if) converted length
-#define TJS_narrowtowide TJS_mbstowcs
+#define TJS_narrowtowidelen(X) TJS_mbstowcs_utf8(NULL, (X),0) // narrow->wide (if) converted length
+#define TJS_narrowtowide TJS_mbstowcs_utf8
 
 
 #ifdef TJS_DEBUG_TRACE

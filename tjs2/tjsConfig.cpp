@@ -32,12 +32,20 @@
  */
 extern tjs_size SJISToUnicodeString(const char * in, tjs_char *out);
 extern tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit );
-extern bool IsSJISLeadByte( tjs_nchar b );
+extern bool IsSJISLeadByte(tjs_nchar b);
 extern tjs_uint UnicodeToSJIS(tjs_char in);
 extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out );
 extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size limit );
-extern bool TVPUtf8ToUtf16( tjs_string& out, const std::string& in );
-extern bool TVPUtf16ToUtf8( std::string& out, const tjs_string& in );
+
+extern tjs_size UTF8ToUnicodeString(const char * in, tjs_char *out);
+extern tjs_size UTF8ToUnicodeString(const char * in, tjs_char *out, tjs_size limit );
+extern bool IsUTF8LeadByte(tjs_nchar b);
+extern tjs_uint UnicodeToUTF8(tjs_char in);
+extern tjs_size UnicodeToUTF8String(const tjs_char *in, tjs_nchar* out);
+extern tjs_size UnicodeToUTF8String(const tjs_char *in, tjs_nchar* out, tjs_size limit);
+
+extern bool TVPUtf8ToUtf16( tjs_string& out, const std::string& in);
+extern bool TVPUtf16ToUtf8( std::string& out, const tjs_string& in);
 
 namespace TJS
 {
@@ -207,7 +215,7 @@ void TJS_cdecl TJS_debug_out(const tjs_char *format, ...)
 //---------------------------------------------------------------------------
 #define TJS_MB_MAX_CHARLEN 2
 //---------------------------------------------------------------------------
-size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n)
+size_t TJS_mbstowcs_sjis(tjs_char *pwcs, const tjs_nchar *s, size_t n)
 {
 	if(pwcs && n == 0) return 0;
 
@@ -226,7 +234,7 @@ size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n)
 	}
 }
 //---------------------------------------------------------------------------
-size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n)
+size_t TJS_wcstombs_sjis(tjs_nchar *s, const tjs_char *pwcs, size_t n)
 {
 	if(s && !n) return 0;
 
@@ -247,7 +255,7 @@ size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n)
 }
 //---------------------------------------------------------------------------
 // 使われていないようなので未確認注意
-int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n)
+int TJS_mbtowc_sjis(tjs_char *pwc, const tjs_nchar *s, size_t n)
 {
 	if(!s || !n) return 0;
 
@@ -278,10 +286,99 @@ int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n)
 }
 //---------------------------------------------------------------------------
 // 使われていないようなので未確認注意
-int TJS_wctomb(tjs_nchar *s, tjs_char wc)
+int TJS_wctomb_sjis(tjs_nchar *s, tjs_char wc)
 {
 	if(!s) return 0;
 	tjs_uint c = UnicodeToSJIS(wc);
+	if( c == 0 ) return -1;
+	int size = 0;
+	if( c & 0xff00 )
+	{
+		*s = static_cast<tjs_nchar>((c>>8)&0xff);
+		s++;
+		size++;
+	}
+	*s = static_cast<tjs_nchar>( c&0xff );
+	size++;
+	return size;
+}
+
+//---------------------------------------------------------------------------
+size_t TJS_mbstowcs_utf8(tjs_char *pwcs, const tjs_nchar *s, size_t n)
+{
+	if(pwcs && n == 0) return 0;
+
+	if(pwcs)
+	{
+		size_t count = UTF8ToUnicodeString( s, pwcs, n );
+		if( n > count )
+		{
+			pwcs[count] = TJS_W('\0');
+		}
+		return count;
+	}
+	else
+	{	// count length
+		return UTF8ToUnicodeString( s, NULL );
+	}
+}
+//---------------------------------------------------------------------------
+size_t TJS_wcstombs_utf8(tjs_nchar *s, const tjs_char *pwcs, size_t n)
+{
+	if(s && !n) return 0;
+
+	if(s)
+	{
+		tjs_size count = UnicodeToUTF8String( pwcs, s, n );
+		if( n > count )
+		{
+			s[count] = '\0';
+		}
+		return count;
+	}
+	else
+	{
+		// Returns the buffer size to store the result
+		return UnicodeToUTF8String(pwcs,NULL);
+	}
+}
+//---------------------------------------------------------------------------
+// 使われていないようなので未確認注意
+int TJS_mbtowc_utf8(tjs_char *pwc, const tjs_nchar *s, size_t n)
+{
+	if(!s || !n) return 0;
+
+	if(*s == 0)
+	{
+		if(pwc) *pwc = 0;
+		return 0;
+	}
+
+	/* Borland's RTL seems to assume always MB_MAX_CHARLEN = 2. */
+	/* This may true while we use Win32 platforms ... */
+	if( IsUTF8LeadByte( *s ) )
+	{
+		// multi(double) byte character
+		if((int)n < TJS_MB_MAX_CHARLEN) return -1;
+		tjs_size count = UTF8ToUnicodeString( s, pwc, 1 );
+		if( count <= 0 )
+		{
+			return -1;
+		}
+		return TJS_MB_MAX_CHARLEN;
+	}
+	else
+	{
+		// single byte character
+		return (int)UTF8ToUnicodeString( s, pwc, 1 );
+	}
+}
+//---------------------------------------------------------------------------
+// 使われていないようなので未確認注意
+int TJS_wctomb_utf8(tjs_nchar *s, tjs_char wc)
+{
+	if(!s) return 0;
+	tjs_uint c = UnicodeToUTF8(wc);
 	if( c == 0 ) return -1;
 	int size = 0;
 	if( c & 0xff00 )
@@ -552,7 +649,7 @@ tTJSNarrowStringHolder::tTJSNarrowStringHolder(const tjs_char * wide)
 	if(!wide)
 		n = -1;
 	else
-		n = (int)TJS_wcstombs(NULL, wide, 0);
+		n = (int)TJS_wcstombs_utf8(NULL, wide, 0);
 
 	if( n == -1 )
 	{
@@ -562,7 +659,7 @@ tTJSNarrowStringHolder::tTJSNarrowStringHolder(const tjs_char * wide)
 	}
 	Buf = new tjs_nchar[n+1];
 	Allocated = true;
-	Buf[TJS_wcstombs(Buf, wide, n)] = 0;
+	Buf[TJS_wcstombs_utf8(Buf, wide, n)] = 0;
 }
 //---------------------------------------------------------------------------
 tTJSNarrowStringHolder::~tTJSNarrowStringHolder()

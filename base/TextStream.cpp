@@ -93,9 +93,9 @@ static ttstr enc_utf8 = TJS_W("utf8"), enc_utf8_2 = TJS_W("utf-8"), enc_utf16 = 
 	enc_jis_2 = TJS_W("shiftjis"), enc_jis_3 = TJS_W("shift_jis"), enc_jis_4 = TJS_W("shift-jis");
 bool TVPStringDecode(const void *p, int len, ttstr& result, ttstr encoding /*= "utf8"*/) {
 	if (encoding == enc_utf8 || encoding == enc_utf8_2) {
-		int n = (int)TJS_mbstowcs(NULL, (char*)p, len);
+		int n = (int)TJS_mbstowcs_utf8(NULL, (char*)p, len);
 		if (n == -1) return false;
-		TJS_mbstowcs(result.AllocBuffer(n), (char*)p, len);
+		TJS_mbstowcs_utf8(result.AllocBuffer(n), (char*)p, len);
 	} else if (encoding == enc_utf16 || encoding == enc_utf16_2) {
 		memcpy(result.AllocBuffer(len / 2), p, len);
 		result.FixLen();
